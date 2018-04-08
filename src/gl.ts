@@ -24,17 +24,15 @@ class GlFramework {
         // Clear the color buffer with specified clear color
         this.webGlContext.clear(this.webGlContext.COLOR_BUFFER_BIT);
 
-        $.get(vsSourceFile, (vsSource) => {
-            this.vsSource = vsSource;
-            $.get(fsSourceFile, (fsSource) => {
-                this.fsSource = fsSource;
-                this.initialize();
-            });
+        let vsTask = $.get(vsSourceFile, (vsSource) => this.vsSource = vsSource);
+        let fsTask = $.get(fsSourceFile, (fsSource) => this.fsSource = fsSource);
+
+        $.when(vsTask, fsTask).done(() => {
+            this.initialize();
         });
     }
 
     initialize() {
-        console.log(this.vsSource, this.fsSource);
         // Initialize a shader program; this is where all the lighting
         // for the vertices and so forth is established.
         const shaderProgram = initShaderProgram(this.webGlContext, this.vsSource, this.fsSource);
